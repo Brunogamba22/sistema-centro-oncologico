@@ -293,7 +293,7 @@ export default function MedicalAgendaPage() {
 
           {view === 'week' && (
             <CardContent className="p-3 sm:p-5">
-              <div className="grid gap-2 sm:grid-cols-7">
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-7">
                 {weekDays.map((date) => {
                   const key = toDateKey(date);
                   const dow = date.getDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6;
@@ -363,7 +363,8 @@ export default function MedicalAgendaPage() {
           )}
 
           {view === 'month' && (
-            <CardContent className="p-3 sm:p-5">
+            <CardContent className="overflow-x-auto p-3 sm:p-5">
+              <div className="min-w-[520px]">
               <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-slate-500">
                 {WEEKDAYS.map((d) => (
                   <div key={d} className="py-1.5">
@@ -414,6 +415,7 @@ export default function MedicalAgendaPage() {
                     </button>
                   );
                 })}
+              </div>
               </div>
             </CardContent>
           )}

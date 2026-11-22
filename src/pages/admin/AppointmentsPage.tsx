@@ -447,7 +447,8 @@ export default function AppointmentsPage() {
                 </div>
               }
             />
-            <CardContent className="p-3 sm:p-5">
+            <CardContent className="overflow-x-auto p-3 sm:p-5">
+              <div className="min-w-[460px]">
               <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-slate-500">
                 {WEEKDAYS.map((d) => (
                   <div key={d} className="py-2">
@@ -492,6 +493,7 @@ export default function AppointmentsPage() {
                     </button>
                   );
                 })}
+              </div>
               </div>
             </CardContent>
           </Card>

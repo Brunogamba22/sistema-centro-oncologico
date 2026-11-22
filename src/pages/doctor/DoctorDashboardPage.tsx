@@ -66,9 +66,11 @@ export default function DoctorDashboardPage() {
 
     return {
       doctor,
+      allPatients,
       myPatients,
+      authorizedIds,
       myAppointments: allAppointments
-        .filter((a) => a.doctorId === doctorId && authorizedIds.has(a.patientId))
+        .filter((a) => a.doctorId === doctorId)
         .sort((a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime()),
       myRequests: allRequests
         .filter((r) => r.doctorId === doctorId && authorizedIds.has(r.patientId))
@@ -84,7 +86,7 @@ export default function DoctorDashboardPage() {
 
   const derived = useMemo(() => {
     if (!data) return null;
-    const patientsById = new Map(data.myPatients.map((p) => [p.id, p]));
+    const patientsById = new Map(data.allPatients.map((p) => [p.id, p]));
     const coveragesById = new Map(data.coverages.map((c) => [c.id, c]));
     const specialtiesById = new Map(data.specialties.map((s) => [s.id, s]));
 
@@ -268,7 +270,7 @@ export default function DoctorDashboardPage() {
                         />
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
-                            {patient ? (
+                            {patient && data.authorizedIds.has(patient.id) ? (
                               <Link
                                 to={`/medico/pacientes/${patient.id}`}
                                 className="truncate text-sm font-semibold text-slate-900 hover:text-primary-700 hover:underline"
@@ -276,7 +278,9 @@ export default function DoctorDashboardPage() {
                                 {patient.firstName} {patient.lastName}
                               </Link>
                             ) : (
-                              <span className="text-sm font-semibold text-slate-900">Paciente</span>
+                              <span className="truncate text-sm font-semibold text-slate-900">
+                                {patient ? `${patient.firstName} ${patient.lastName}` : 'Paciente'}
+                              </span>
                             )}
                             <Badge variant={statusMeta.variant} dot>
                               {statusMeta.label}

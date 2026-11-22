@@ -446,7 +446,7 @@ export default function ChatbotDemoPage() {
       </div>
 
       {/* Interfaz principal estilo WhatsApp Web de 3 columnas */}
-      <div className="grid h-[calc(100vh-205px)] min-h-[600px] max-h-[820px] grid-cols-1 overflow-hidden rounded-2xl border border-line bg-white shadow-card lg:grid-cols-[290px_minmax(0,1fr)_305px] xl:grid-cols-[315px_minmax(0,1fr)_325px]">
+      <div className="grid h-[calc(100dvh-230px)] min-h-[460px] max-h-[820px] grid-cols-1 overflow-hidden rounded-2xl border border-line bg-white shadow-card lg:h-[calc(100vh-205px)] lg:min-h-[600px] lg:grid-cols-[290px_minmax(0,1fr)_305px] xl:grid-cols-[315px_minmax(0,1fr)_325px]">
         {/* Columna 1: Conversaciones */}
         <div className={`min-h-0 ${mobilePane === 'list' ? 'block' : 'hidden'} lg:block`}>
           <ConversationListColumn

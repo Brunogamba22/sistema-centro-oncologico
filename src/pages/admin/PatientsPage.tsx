@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Eye, Pencil, Plus, RotateCcw, Search, Users } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import {
@@ -37,7 +37,17 @@ export default function PatientsPage() {
     return { patients, coverages, doctors };
   }, []);
 
-  const [search, setSearch] = useState('');
+  const [searchParams] = useSearchParams();
+  const initialQuery = searchParams.get('q') ?? '';
+  const [search, setSearch] = useState(initialQuery);
+
+  useEffect(() => {
+    const qParam = searchParams.get('q');
+    if (qParam !== null) {
+      setSearch(qParam);
+      setPage(1);
+    }
+  }, [searchParams]);
   const [statusFilter, setStatusFilter] = useState('');
   const [coverageFilter, setCoverageFilter] = useState('');
   const [doctorFilter, setDoctorFilter] = useState('');

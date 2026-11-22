@@ -92,6 +92,20 @@ export const doctorPortalService = {
     await mockResponse(true, 150);
   },
 
+  pushNotification(
+    input: Omit<DoctorNotification, 'id' | 'read' | 'createdAt'>,
+  ): DoctorNotification {
+    const created: DoctorNotification = {
+      ...input,
+      id: `dnot-${String(notificationsStore.length + 1).padStart(3, '0')}-${Date.now().toString().slice(-3)}`,
+      read: false,
+      createdAt: new Date().toISOString(),
+    };
+    notificationsStore = [created, ...notificationsStore];
+    notifyListeners();
+    return created;
+  },
+
   subscribeNotifications(listener: () => void): () => void {
     listeners.add(listener);
     return () => listeners.delete(listener);

@@ -8,10 +8,40 @@ export function normalizeText(text: string): string {
     .trim();
 }
 
+const INTERNAL_COMMAND_PREFIXES = [
+  'menu:',
+  'esp:',
+  'doc:',
+  'date:',
+  'time:',
+  'apttype:',
+  'confirm:',
+  'apt:',
+  'aptact:',
+  'cancel:',
+  'rdate:',
+  'rtime:',
+  'resched:',
+  'rxcov:',
+  'rxaff:',
+  'rxprev:',
+  'rxconfirm:',
+  'doctype:',
+  'docfile:',
+  'docconfirm:',
+  'handoff:',
+  'cmd:',
+];
+
+function isInternalCommand(rawText: string): boolean {
+  const trimmed = rawText.trim();
+  return INTERNAL_COMMAND_PREFIXES.some((prefix) => trimmed.startsWith(prefix));
+}
+
 const EMERGENCY_KEYWORDS = [
   'fiebre',
-  '38',
-  '39',
+  '38 grados',
+  '39 grados',
   '40 grados',
   'falta de aire',
   'disnea',
@@ -30,6 +60,8 @@ const EMERGENCY_KEYWORDS = [
   'vomitos persistentes',
   'reaccion alergica',
 ];
+
+const FEVER_TEMP_REGEX = /\b(38|39|40|41)([.,]\d)?\s*(°|º|grados|c\b)/i;
 
 const CLINICAL_ADVICE_KEYWORDS = [
   'diagnostic',
@@ -53,11 +85,13 @@ const CLINICAL_ADVICE_KEYWORDS = [
 ];
 
 export function isEmergencyMessage(rawText: string): boolean {
+  if (isInternalCommand(rawText)) return false;
   const text = normalizeText(rawText);
-  return EMERGENCY_KEYWORDS.some((kw) => text.includes(kw));
+  return EMERGENCY_KEYWORDS.some((kw) => text.includes(kw)) || FEVER_TEMP_REGEX.test(rawText);
 }
 
 export function isClinicalAdviceRequest(rawText: string): boolean {
+  if (isInternalCommand(rawText)) return false;
   const text = normalizeText(rawText);
   return CLINICAL_ADVICE_KEYWORDS.some((kw) => text.includes(kw));
 }

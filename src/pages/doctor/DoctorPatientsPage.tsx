@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowRight, Search, ShieldCheck, Users } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import {
@@ -31,7 +31,15 @@ export default function DoctorPatientsPage() {
   const { user } = useAuth();
   const doctorId = user?.doctorId;
 
-  const [query, setQuery] = useState('');
+  const [searchParams] = useSearchParams();
+  const [query, setQuery] = useState(() => searchParams.get('q') ?? '');
+
+  useEffect(() => {
+    const qParam = searchParams.get('q');
+    if (qParam !== null) {
+      setQuery(qParam);
+    }
+  }, [searchParams]);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [coverageFilter, setCoverageFilter] = useState<string>('all');
 

@@ -29,7 +29,7 @@ import {
 import type { Appointment, AppointmentStatus } from '@/types';
 import { cn } from '@/utils/cn';
 import { addDays, getMonthGrid, isSameDay, startOfWeekMonday, toDateKey } from '@/utils/date';
-import { formatDNI, formatLongDate, formatTime } from '@/utils/format';
+import { formatDate, formatDNI, formatLongDate, formatTime } from '@/utils/format';
 
 type CalendarView = 'day' | 'week' | 'month';
 
@@ -57,13 +57,13 @@ export default function DoctorAgendaPage() {
     ]);
 
     const myPatients = doctorPortalService.filterAuthorizedPatients(allPatients, doctorId);
-    const authorizedIds = new Set(myPatients.map((p) => p.id));
 
     return {
       doctor,
+      allPatients,
       myPatients,
       myAppointments: allAppointments
-        .filter((a) => a.doctorId === doctorId && authorizedIds.has(a.patientId))
+        .filter((a) => a.doctorId === doctorId)
         .sort((a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime()),
       myBlocks: allBlocks.filter((b) => b.doctorId === doctorId),
       coverages,
@@ -75,7 +75,7 @@ export default function DoctorAgendaPage() {
 
   const derived = useMemo(() => {
     if (!data) return null;
-    const patientsById = new Map(data.myPatients.map((p) => [p.id, p]));
+    const patientsById = new Map(data.allPatients.map((p) => [p.id, p]));
     const coveragesById = new Map(data.coverages.map((c) => [c.id, c]));
     const specialtiesById = new Map(data.specialties.map((s) => [s.id, s]));
 
@@ -174,7 +174,7 @@ export default function DoctorAgendaPage() {
       {/* Barra de navegación de fecha y filtro */}
       <Card>
         <CardContent className="flex flex-col gap-3 py-3.5 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               variant="outline"
               size="sm"
@@ -317,8 +317,8 @@ export default function DoctorAgendaPage() {
                       <div key={blk.id} className="rounded-lg border border-amber-200 bg-amber-50/50 p-3 text-xs">
                         <p className="font-semibold text-amber-900">{blk.reason}</p>
                         <p className="mt-0.5 text-amber-800">
-                          {blk.startDate}
-                          {blk.endDate !== blk.startDate ? ` al ${blk.endDate}` : ''} ·{' '}
+                          {formatDate(blk.startDate)}
+                          {blk.endDate !== blk.startDate ? ` al ${formatDate(blk.endDate)}` : ''} ·{' '}
                           {blk.allDay ? 'Día completo' : `${blk.startTime} - ${blk.endTime} hs`}
                         </p>
                       </div>
@@ -412,7 +412,8 @@ export default function DoctorAgendaPage() {
 
       {/* VISTA MENSUAL */}
       {view === 'month' && (
-        <Card className="overflow-hidden">
+        <Card className="overflow-x-auto">
+          <div className="min-w-[600px]">
           <div className="grid grid-cols-7 border-b border-line bg-surface text-center text-xs font-semibold uppercase tracking-wide text-slate-500">
             {WEEKDAY_HEADERS.map((label) => (
               <div key={label} className="py-2.5">
@@ -497,6 +498,7 @@ export default function DoctorAgendaPage() {
                 </div>
               );
             })}
+          </div>
           </div>
         </Card>
       )}

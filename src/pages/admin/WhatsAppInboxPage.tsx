@@ -369,7 +369,7 @@ export default function WhatsAppInboxPage() {
                           {isBot && <Bot className="h-3 w-3" />}
                           {msg.senderName}
                         </p>
-                        <p className="leading-relaxed">{msg.text}</p>
+                        <p className="whitespace-pre-line leading-relaxed">{msg.text}</p>
                         <p className={`mt-1 text-right text-[10px] ${isPatient ? 'text-slate-400' : 'text-white/70'}`}>
                           {formatTime(msg.sentAt)} hs
                         </p>

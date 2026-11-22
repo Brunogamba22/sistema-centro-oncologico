@@ -26,7 +26,10 @@ export const medicalRequestsService = {
           id: `h-${Date.now()}`,
           date: now,
           actor: actorName,
-          action: 'Solicitud registrada en panel administrativo',
+          action:
+            payload.channel === 'whatsapp'
+              ? 'Solicitud recibida vía Chatbot WhatsApp'
+              : 'Solicitud registrada en panel administrativo',
         },
       ],
     };

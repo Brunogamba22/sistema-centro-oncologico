@@ -2,11 +2,11 @@ import { BRAND } from '@/config/brand';
 import { APPOINTMENT_STATUS_META, APPOINTMENT_TYPE_LABELS } from '@/config/status';
 import {
   appointmentsService,
+  doctorPortalService,
   documentsService,
   medicalRequestsService,
   notificationsService,
   patientHistoryService,
-  whatsappService,
 } from '@/services';
 import type { AppointmentType, DocumentCategory, Patient, WhatsAppConversation, WhatsAppMessage } from '@/types';
 import { addMinutesToTime, combineDateAndTime } from '@/utils/date';
@@ -236,7 +236,12 @@ export async function processPatientTurn(
 
   // Derivación prioritaria directa desde alerta de urgencia
   if (input === 'handoff:Recepción:urgencia') {
-    await whatsappService.transferTo(ctx.conversation.id, 'Recepción');
+    const sysMsg = makeMsg(
+      'sistema',
+      'Sistema',
+      'Derivación prioritaria a Recepción (Protocolo de urgencia). Bot pausado.',
+      150,
+    );
     const botMsg = makeMsg(
       'bot',
       BOT_NAME,
@@ -244,7 +249,7 @@ export async function processPatientTurn(
       300,
     );
     return {
-      messages: [patientMsg, botMsg],
+      messages: [patientMsg, sysMsg, botMsg],
       nextSession: {
         ...session,
         flow: 'atencion_humana',
@@ -255,7 +260,8 @@ export async function processPatientTurn(
         status: 'espera_humano',
         botEnabled: false,
         department: 'Recepción',
-        tags: Array.from(new Set([...ctx.conversation.tags, 'Prioritario', 'Urgencia'])),
+        assignedTo: undefined,
+        tags: Array.from(new Set([...ctx.conversation.tags.filter((t) => t !== 'Bot activo'), 'Prioritario', 'Urgencia'])),
       },
       attachments,
       mutatedDomain: true,
@@ -1034,6 +1040,16 @@ export async function processPatientTurn(
           doctorId,
         });
 
+        doctorPortalService.pushNotification({
+          doctorId,
+          category: 'turno',
+          patientId: patient.id,
+          title: 'Nuevo turno agendado por WhatsApp',
+          message: `${patient.firstName} ${patient.lastName} reservó un turno para el ${formatDate(startAt)} a las ${time} hs.`,
+          type: 'info',
+          link: '/medico/agenda',
+        });
+
         const { nextSession } = goToMenu(session, '');
         const botMsg = makeMsg(
           'bot',
@@ -1233,6 +1249,23 @@ export async function processPatientTurn(
           message: `Se canceló el turno del ${formatDate(apt.startAt)} ${formatTime(apt.startAt)} hs.`,
           appointmentId: apt.id,
         });
+        await patientHistoryService.addEntry({
+          patientId: patient.id,
+          date: new Date().toISOString(),
+          category: 'administrativo',
+          title: 'Turno cancelado por WhatsApp',
+          description: `El paciente canceló su turno del ${formatDate(apt.startAt)} a las ${formatTime(apt.startAt)} hs.`,
+          doctorId: apt.doctorId,
+        });
+        doctorPortalService.pushNotification({
+          doctorId: apt.doctorId,
+          category: 'turno',
+          patientId: patient.id,
+          title: 'Turno cancelado por WhatsApp',
+          message: `${patient.firstName} ${patient.lastName} canceló su turno del ${formatDate(apt.startAt)} a las ${formatTime(apt.startAt)} hs.`,
+          type: 'warning',
+          link: '/medico/agenda',
+        });
         const { nextSession } = goToMenu(session, '');
         return {
           messages: [
@@ -1357,6 +1390,23 @@ export async function processPatientTurn(
           subject: 'Turno reprogramado por WhatsApp',
           message: `Tu turno fue reprogramado al ${formatDate(startAt)} a las ${session.manage.newTime} hs.`,
           appointmentId: apt.id,
+        });
+        await patientHistoryService.addEntry({
+          patientId: patient.id,
+          date: new Date().toISOString(),
+          category: 'administrativo',
+          title: 'Turno reprogramado por WhatsApp',
+          description: `Reprogramado al ${formatDate(startAt)} a las ${session.manage.newTime} hs.`,
+          doctorId: apt.doctorId,
+        });
+        doctorPortalService.pushNotification({
+          doctorId: apt.doctorId,
+          category: 'turno',
+          patientId: patient.id,
+          title: 'Turno reprogramado por WhatsApp',
+          message: `${patient.firstName} ${patient.lastName} reprogramó su turno al ${formatDate(startAt)} a las ${session.manage.newTime} hs.`,
+          type: 'info',
+          link: '/medico/agenda',
         });
 
         const { nextSession } = goToMenu(session, '');
@@ -1655,6 +1705,18 @@ export async function processPatientTurn(
           doctorId: patient.assignedDoctorId,
         });
 
+        if (patient.assignedDoctorId) {
+          doctorPortalService.pushNotification({
+            doctorId: patient.assignedDoctorId,
+            category: 'receta',
+            patientId: patient.id,
+            title: 'Nueva solicitud de receta por WhatsApp',
+            message: `${patient.firstName} ${patient.lastName} solicitó revisión de ${rx.declaredMedication ?? 'medicación declarada'} (${created.id.toUpperCase()}).`,
+            type: 'warning',
+            link: '/medico/recetas',
+          });
+        }
+
         const { nextSession } = goToMenu(session, '');
         return {
           messages: [
@@ -1781,12 +1843,17 @@ export async function processPatientTurn(
       const docType = session.document.docTypeLabel ?? 'Estudio';
       const category = session.document.category ?? 'estudio';
 
+      if (norm === 'no' || norm === 'cancelar' || norm === 'cancel') {
+        const { botText, nextSession } = goToMenu(session, 'Envío de documentación cancelado. ¿En qué más te puedo ayudar?');
+        return { messages: [patientMsg, makeMsg('bot', BOT_NAME, botText, 250)], nextSession, attachments };
+      }
+
       if (file && (input === 'docconfirm:yes' || norm === 'si' || norm === 'confirmar' || norm.length > 0)) {
         const finalName =
           docType === 'Derivación' && !file.name.toLowerCase().includes('derivacion')
             ? `Derivación - ${file.name}`
             : file.name;
-        const noteText = input === 'docconfirm:yes' || norm === 'si' ? '' : ` Nota del paciente: "${input}".`;
+        const noteText = input === 'docconfirm:yes' || norm === 'si' || norm === 'confirmar' ? '' : ` Nota del paciente: "${input}".`;
 
         const saved = await documentsService.uploadSimulated({
           patientId: patient.id,
@@ -1805,6 +1872,18 @@ export async function processPatientTurn(
           description: `Archivo "${saved.name}" clasificado como ${docType} vía Chatbot WhatsApp.${noteText}`,
           doctorId: patient.assignedDoctorId,
         });
+
+        if (patient.assignedDoctorId) {
+          doctorPortalService.pushNotification({
+            doctorId: patient.assignedDoctorId,
+            category: 'documento',
+            patientId: patient.id,
+            title: `Nueva documentación recibida (${docType})`,
+            message: `${patient.firstName} ${patient.lastName} envió "${saved.name}" por WhatsApp.`,
+            type: 'info',
+            link: '/medico/documentacion',
+          });
+        }
 
         const { nextSession } = goToMenu(session, '');
         return {

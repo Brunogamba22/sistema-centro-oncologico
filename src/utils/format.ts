@@ -2,7 +2,13 @@ import { LOCALE, TIMEZONE } from '@/config/constants';
 
 type DateInput = Date | string | number;
 
-const toDate = (value: DateInput): Date => (value instanceof Date ? value : new Date(value));
+const toDate = (value: DateInput): Date => {
+  if (value instanceof Date) return value;
+  if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return new Date(`${value}T12:00:00`);
+  }
+  return new Date(value);
+};
 
 const dateFormatter = new Intl.DateTimeFormat(LOCALE, {
   day: '2-digit',

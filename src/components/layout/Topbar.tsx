@@ -1,7 +1,6 @@
-import type { FormEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, type FormEvent } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Bell, Menu, Search } from 'lucide-react';
-import { useToast } from '@/context/toast/useToast';
 import { UserMenu } from './UserMenu';
 
 interface TopbarProps {
@@ -13,15 +12,14 @@ interface TopbarProps {
 }
 
 export function Topbar({ panelLabel, pageTitle, notificationsPath, unreadNotifications = 0, onMenuClick }: TopbarProps) {
-  const { toast } = useToast();
+  const navigate = useNavigate();
+  const [query, setQuery] = useState('');
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    toast({
-      title: 'Búsqueda global',
-      description: 'La búsqueda se habilitará junto con los módulos de pacientes y turnos.',
-      variant: 'info',
-    });
+    const trimmed = query.trim();
+    const basePath = notificationsPath.startsWith('/medico') ? '/medico' : '/admin';
+    navigate(trimmed ? `${basePath}/pacientes?q=${encodeURIComponent(trimmed)}` : `${basePath}/pacientes`);
   };
 
   return (
@@ -46,8 +44,10 @@ export function Topbar({ panelLabel, pageTitle, notificationsPath, unreadNotific
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             type="search"
-            placeholder="Buscar pacientes, turnos…"
-            aria-label="Búsqueda global"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Buscar pacientes por nombre o DNI…"
+            aria-label="Buscar pacientes"
             className="h-9 w-56 rounded-lg border border-line bg-surface pl-9 pr-3 text-sm placeholder:text-slate-400 focus:border-primary-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-100 lg:w-72"
           />
         </form>

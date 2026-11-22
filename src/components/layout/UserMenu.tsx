@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, LogOut, Repeat } from 'lucide-react';
+import { ChevronDown, LogOut, MessageCircle, Repeat } from 'lucide-react';
 import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { ROLE_CONFIG } from '@/config/roles';
@@ -55,6 +55,17 @@ export function UserMenu() {
             </div>
           </div>
           <div className="p-1.5">
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                navigate('/chatbot');
+              }}
+              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50"
+            >
+              <MessageCircle className="h-4 w-4 text-accent-600" /> Demo Chatbot WhatsApp
+            </button>
             <button
               type="button"
               role="menuitem"
