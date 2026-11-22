@@ -1,0 +1,182 @@
+/**
+ * DATOS FICTICIOS — bandeja de conversaciones de WhatsApp.
+ */
+import type { WhatsAppConversation } from '@/types';
+
+const now = Date.now();
+const minsAgo = (m: number) => new Date(now - m * 60 * 1000).toISOString();
+
+export const whatsappConversations: WhatsAppConversation[] = [
+  {
+    id: 'wa-001',
+    patientId: 'pat-001',
+    phone: '5491140001001',
+    status: 'espera_humano',
+    botEnabled: false,
+    department: 'Documentación',
+    unreadCount: 2,
+    tags: ['Receta', 'Prioritario'],
+    lastMessageAt: minsAgo(6),
+    messages: [
+      {
+        id: 'm-101',
+        sender: 'paciente',
+        senderName: 'Ana Laura Gómez',
+        text: 'Hola, buen día. Necesito renovar la receta del ciclo 4 con el Dr. Ferreyra.',
+        sentAt: minsAgo(25),
+      },
+      {
+        id: 'm-102',
+        sender: 'bot',
+        senderName: 'Asistente COI',
+        text: 'Hola Ana Laura. Registramos tu solicitud de receta (N° sol-001) para el Dr. Martín Ferreyra. ¿Deseás agregar alguna aclaración o hablar con recepción?',
+        sentAt: minsAgo(24),
+      },
+      {
+        id: 'm-103',
+        sender: 'paciente',
+        senderName: 'Ana Laura Gómez',
+        text: 'Sí, por favor. La farmacia me pide que figure el diagnóstico actualizado para la prepaga.',
+        sentAt: minsAgo(10),
+      },
+      {
+        id: 'm-104',
+        sender: 'sistema',
+        senderName: 'Sistema',
+        text: 'Conversación derivada a atención humana · Área Documentación.',
+        sentAt: minsAgo(9),
+      },
+      {
+        id: 'm-105',
+        sender: 'paciente',
+        senderName: 'Ana Laura Gómez',
+        text: '¿Me avisan cuando esté lista para retirarla o si la mandan por mail?',
+        sentAt: minsAgo(6),
+      },
+    ],
+  },
+  {
+    id: 'wa-002',
+    patientId: 'pat-002',
+    phone: '5491140001002',
+    status: 'en_atencion',
+    botEnabled: false,
+    assignedTo: 'Lucía Benítez',
+    department: 'Turnos',
+    unreadCount: 0,
+    tags: ['Reprogramación', 'Hematología'],
+    lastMessageAt: minsAgo(18),
+    messages: [
+      {
+        id: 'm-201',
+        sender: 'paciente',
+        senderName: 'Carlos Alberto Méndez',
+        text: 'Buenas tardes, tengo turno con la Dra. Ibarra pero necesito pasarlo para la semana próxima.',
+        sentAt: minsAgo(45),
+      },
+      {
+        id: 'm-202',
+        sender: 'agente',
+        senderName: 'Lucía Benítez',
+        text: 'Hola Carlos, soy Lucía de Recepción. Tengo disponibilidad el martes a las 10:20 hs o el jueves a las 11:00 hs en Sede Central.',
+        sentAt: minsAgo(30),
+      },
+      {
+        id: 'm-203',
+        sender: 'paciente',
+        senderName: 'Carlos Alberto Méndez',
+        text: 'El martes a las 10:20 hs me viene perfecto. Muchas gracias.',
+        sentAt: minsAgo(18),
+      },
+    ],
+  },
+  {
+    id: 'wa-003',
+    patientId: 'pat-003',
+    phone: '5491140001003',
+    status: 'bot',
+    botEnabled: true,
+    department: 'Asistente virtual',
+    unreadCount: 0,
+    tags: ['Confirmación', 'Bot activo'],
+    lastMessageAt: minsAgo(40),
+    messages: [
+      {
+        id: 'm-301',
+        sender: 'bot',
+        senderName: 'Asistente COI',
+        text: 'Hola Beatriz Elena. Te recordamos tu turno de Mastología con la Dra. Florencia Aguirre en Sede Belgrano. Respondé 1 para confirmar o 2 para reprogramar.',
+        sentAt: minsAgo(55),
+      },
+      {
+        id: 'm-302',
+        sender: 'paciente',
+        senderName: 'Beatriz Elena Sánchez',
+        text: '1',
+        sentAt: minsAgo(41),
+      },
+      {
+        id: 'm-303',
+        sender: 'bot',
+        senderName: 'Asistente COI',
+        text: '¡Gracias! Tu turno quedó confirmado. Recordá concurrir con DNI y credencial de obra social.',
+        sentAt: minsAgo(40),
+      },
+    ],
+  },
+  {
+    id: 'wa-004',
+    patientId: 'pat-004',
+    phone: '5493514001004',
+    status: 'resuelta',
+    botEnabled: true,
+    assignedTo: 'Lucía Benítez',
+    department: 'Recepción',
+    unreadCount: 0,
+    tags: ['Certificado', 'Entregado'],
+    lastMessageAt: minsAgo(160),
+    messages: [
+      {
+        id: 'm-401',
+        sender: 'agente',
+        senderName: 'Lucía Benítez',
+        text: 'Hola Diego, te enviamos el certificado de asistencia a radioterapia firmado por el Dr. Quiroga.',
+        sentAt: minsAgo(170),
+      },
+      {
+        id: 'm-402',
+        sender: 'paciente',
+        senderName: 'Diego Fernando Pereyra',
+        text: 'Recibido perfecto, ¡muchas gracias por la rapidez!',
+        sentAt: minsAgo(160),
+      },
+    ],
+  },
+  {
+    id: 'wa-005',
+    patientId: 'pat-005',
+    phone: '5491140001005',
+    status: 'espera_humano',
+    botEnabled: false,
+    department: 'Recepción',
+    unreadCount: 1,
+    tags: ['Consulta cobertura'],
+    lastMessageAt: minsAgo(12),
+    messages: [
+      {
+        id: 'm-501',
+        sender: 'paciente',
+        senderName: 'Silvia Patricia Romero',
+        text: 'Hola, cambié de plan en mi prepaga y quiero actualizar el número de afiliado antes del próximo turno.',
+        sentAt: minsAgo(14),
+      },
+      {
+        id: 'm-502',
+        sender: 'sistema',
+        senderName: 'Sistema',
+        text: 'Asistente virtual derivó la consulta a Recepción para actualización administrativa.',
+        sentAt: minsAgo(12),
+      },
+    ],
+  },
+];

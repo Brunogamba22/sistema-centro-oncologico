@@ -1,4 +1,15 @@
+export { agendaService } from './agendaService';
 export { apiClient, ApiError, mockResponse } from './apiClient';
+export { appointmentsService } from './appointmentsService';
+export { auditService } from './auditService';
 export { authService } from './authService';
 export { catalogService } from './catalogService';
 export { doctorsService } from './doctorsService';
+export { documentsService } from './documentsService';
+export { medicalRequestsService } from './medicalRequestsService';
+export { notificationsService } from './notificationsService';
+export { patientHistoryService } from './patientHistoryService';
+export { patientsService } from './patientsService';
+export { settingsService } from './settingsService';
+export { usersService } from './usersService';
+export { whatsappService } from './whatsappService';

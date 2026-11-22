@@ -64,6 +64,8 @@ export interface Specialty {
   description: string;
   /** Color de referencia (hex) para agendas y gráficos. */
   color: string;
+  /** Duración estándar de la consulta en minutos. */
+  defaultDurationMinutes?: number;
   active: boolean;
 }
 
@@ -84,6 +86,8 @@ export interface Doctor extends Timestamps {
   specialtyIds: ID[];
   email: string;
   phone: string;
+  /** Sede principal de atención. */
+  siteId?: ID;
   active: boolean;
   schedule: WeeklySchedule[];
 }
@@ -122,6 +126,14 @@ export type MedicalRequestType = 'receta' | 'orden_estudio' | 'certificado' | 'i
 export type MedicalRequestStatus = 'pendiente' | 'en_revision' | 'aprobada' | 'rechazada' | 'entregada';
 export type Priority = 'baja' | 'media' | 'alta';
 
+export interface MedicalRequestHistoryEntry {
+  id: ID;
+  date: ISODateString;
+  actor: string;
+  action: string;
+  note?: string;
+}
+
 export interface MedicalRequest extends Timestamps {
   id: ID;
   type: MedicalRequestType;
@@ -132,6 +144,7 @@ export interface MedicalRequest extends Timestamps {
   channel: Channel;
   description: string;
   resolutionNotes?: string;
+  history?: MedicalRequestHistoryEntry[];
 }
 
 /* ---------- Documentación ---------- */
@@ -176,10 +189,156 @@ export interface AuditLog {
   id: ID;
   userId: ID;
   userName: string;
+  userRole?: 'admin' | 'medico' | 'recepcionista';
   action: AuditAction;
+  module?: string;
   entity: string;
   entityId?: ID;
   description: string;
   ip: string;
   createdAt: ISODateString;
+}
+
+/* ---------- Agenda médica: bloqueos y ausencias ---------- */
+
+export type UnavailabilityType = 'bloqueo' | 'vacaciones' | 'ausencia';
+
+export interface DoctorUnavailability extends Timestamps {
+  id: ID;
+  doctorId: ID;
+  type: UnavailabilityType;
+  /** Fecha YYYY-MM-DD (inicio) */
+  startDate: string;
+  /** Fecha YYYY-MM-DD (fin, inclusive) */
+  endDate: string;
+  allDay: boolean;
+  startTime?: TimeString;
+  endTime?: TimeString;
+  reason: string;
+}
+
+/* ---------- Historial del paciente ---------- */
+
+export type PatientHistoryCategory = 'consulta' | 'tratamiento' | 'estudio' | 'administrativo';
+
+export interface PatientHistoryEvent {
+  id: ID;
+  patientId: ID;
+  date: ISODateString;
+  category: PatientHistoryCategory;
+  title: string;
+  description: string;
+  doctorId?: ID;
+}
+
+/* ---------- WhatsApp (Bandeja operativa) ---------- */
+
+export type WhatsAppConversationStatus = 'bot' | 'espera_humano' | 'en_atencion' | 'resuelta';
+export type WhatsAppMessageSender = 'paciente' | 'bot' | 'agente' | 'sistema';
+
+export interface WhatsAppMessage {
+  id: ID;
+  sender: WhatsAppMessageSender;
+  senderName: string;
+  text: string;
+  sentAt: ISODateString;
+}
+
+export interface WhatsAppConversation {
+  id: ID;
+  patientId: ID;
+  phone: string;
+  status: WhatsAppConversationStatus;
+  botEnabled: boolean;
+  assignedTo?: string;
+  department: 'Recepción' | 'Turnos' | 'Documentación' | 'Asistente virtual';
+  unreadCount: number;
+  tags: string[];
+  lastMessageAt: ISODateString;
+  messages: WhatsAppMessage[];
+}
+
+/* ---------- Notificaciones operativas ---------- */
+
+export type NotificationCategory = 'recordatorio' | 'confirmacion' | 'cancelacion' | 'reprogramacion';
+export type NotificationDeliveryStatus = 'enviada' | 'entregada' | 'leida' | 'fallida' | 'programada';
+export type NotificationChannel = 'whatsapp' | 'email' | 'sms';
+
+export interface NotificationLog {
+  id: ID;
+  category: NotificationCategory;
+  channel: NotificationChannel;
+  patientId: ID;
+  recipient: string;
+  subject: string;
+  message: string;
+  status: NotificationDeliveryStatus;
+  sentAt: ISODateString;
+  appointmentId?: ID;
+}
+
+export interface NotificationRule {
+  id: ID;
+  category: NotificationCategory;
+  name: string;
+  description: string;
+  enabled: boolean;
+  channels: NotificationChannel[];
+  timingLabel: string;
+  template: string;
+}
+
+/* ---------- Usuarios del sistema ---------- */
+
+export interface SystemUser extends Timestamps {
+  id: ID;
+  name: string;
+  email: string;
+  role: 'admin' | 'medico' | 'recepcionista';
+  position: string;
+  active: boolean;
+  lastLoginAt?: ISODateString;
+  doctorId?: ID;
+  siteId?: ID;
+}
+
+/* ---------- Configuración institucional, sedes y consultorios ---------- */
+
+export interface ClinicSite {
+  id: ID;
+  name: string;
+  address: string;
+  city: string;
+  province: string;
+  phone: string;
+  email: string;
+  hours: string;
+  isMain: boolean;
+  active: boolean;
+}
+
+export interface ConsultingRoom {
+  id: ID;
+  siteId: ID;
+  name: string;
+  floor: string;
+  specialtyFocus: string;
+  active: boolean;
+}
+
+export interface InstitutionSettings {
+  name: string;
+  shortName: string;
+  cuit: string;
+  phone: string;
+  whatsapp: string;
+  email: string;
+  website: string;
+  timezone: string;
+  defaultSlotMinutes: number;
+  maxAdvanceBookingDays: number;
+  reminderHoursBefore: number;
+  autoConfirmWhatsapp: boolean;
+  requireDniValidation: boolean;
+  enableChatbotHandoff: boolean;
 }
