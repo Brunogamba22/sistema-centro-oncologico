@@ -15,6 +15,12 @@ export interface DocumentUploadPayload {
 }
 
 export const documentsService = {
+  async listAll(): Promise<ClinicalDocument[]> {
+    if (!env.useMocks) return apiClient.get<ClinicalDocument[]>('/documents');
+    const sorted = [...store].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return mockResponse(sorted, 180);
+  },
+
   async listByPatient(patientId: ID): Promise<ClinicalDocument[]> {
     if (!env.useMocks) return apiClient.get<ClinicalDocument[]>('/documents', { patientId });
     const filtered = store

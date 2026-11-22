@@ -65,6 +65,14 @@ export const DOCUMENT_CATEGORY_META: Record<DocumentCategory, { label: string; v
   otro: { label: 'Otro', variant: 'neutral' },
 };
 
+export const DOCUMENT_DOMAIN_META: Record<DocumentCategory, { domain: 'clinico' | 'administrativo'; label: string }> = {
+  estudio: { domain: 'clinico', label: 'Clínico' },
+  informe: { domain: 'clinico', label: 'Clínico' },
+  receta: { domain: 'clinico', label: 'Clínico' },
+  consentimiento: { domain: 'administrativo', label: 'Administrativo' },
+  otro: { domain: 'administrativo', label: 'Administrativo' },
+};
+
 export const UNAVAILABILITY_META: Record<UnavailabilityType, { label: string; variant: BadgeVariant }> = {
   bloqueo: { label: 'Bloqueo horario', variant: 'warning' },
   vacaciones: { label: 'Vacaciones', variant: 'info' },
@@ -109,6 +117,7 @@ export const MEDICAL_REQUEST_TYPE_META: Record<MedicalRequestType, { label: stri
 export const MEDICAL_REQUEST_STATUS_META: Record<MedicalRequestStatus, { label: string; variant: BadgeVariant }> = {
   pendiente: { label: 'Pendiente', variant: 'warning' },
   en_revision: { label: 'En revisión', variant: 'info' },
+  info_solicitada: { label: 'Info solicitada', variant: 'warning' },
   aprobada: { label: 'Aprobada', variant: 'success' },
   rechazada: { label: 'Rechazada', variant: 'danger' },
   entregada: { label: 'Entregada', variant: 'primary' },

@@ -4,6 +4,7 @@ export { appointmentsService } from './appointmentsService';
 export { auditService } from './auditService';
 export { authService } from './authService';
 export { catalogService } from './catalogService';
+export { doctorPortalService } from './doctorPortalService';
 export { doctorsService } from './doctorsService';
 export { documentsService } from './documentsService';
 export { medicalRequestsService } from './medicalRequestsService';

@@ -27,6 +27,7 @@ const SEEDS: SeedAppointment[] = [
   { id: 'apt-001', dayOffset: 0, time: '08:20', patientId: 'pat-001', doctorId: 'doc-001', specialtyId: 'esp-001', status: 'atendido', type: 'control', channel: 'whatsapp', notes: 'Control previo a ciclo 4.' },
   { id: 'apt-002', dayOffset: 0, time: '09:00', patientId: 'pat-002', doctorId: 'doc-002', specialtyId: 'esp-002', status: 'en_atencion', type: 'control', channel: 'telefono', notes: 'Trae hemograma actualizado.' },
   { id: 'apt-003', dayOffset: 0, time: '09:40', patientId: 'pat-005', doctorId: 'doc-001', specialtyId: 'esp-001', status: 'en_espera', type: 'tratamiento', channel: 'whatsapp', duration: 40, notes: 'Sesión programada en hospital de día.' },
+  { id: 'apt-037', dayOffset: 0, time: '11:20', patientId: 'pat-011', doctorId: 'doc-001', specialtyId: 'esp-001', status: 'confirmado', type: 'control', channel: 'presencial', notes: 'Control de seguimiento semestral.' },
   { id: 'apt-004', dayOffset: 0, time: '10:20', patientId: 'pat-003', doctorId: 'doc-005', specialtyId: 'esp-005', status: 'confirmado', type: 'control', channel: 'presencial' },
   { id: 'apt-005', dayOffset: 0, time: '11:00', patientId: 'pat-004', doctorId: 'doc-003', specialtyId: 'esp-003', status: 'confirmado', type: 'tratamiento', channel: 'whatsapp' },
   { id: 'apt-006', dayOffset: 0, time: '11:40', patientId: 'pat-007', doctorId: 'doc-005', specialtyId: 'esp-005', status: 'pendiente', type: 'estudio', channel: 'web', notes: 'Falta confirmar asistencia por WhatsApp.' },

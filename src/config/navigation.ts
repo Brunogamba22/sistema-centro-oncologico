@@ -5,6 +5,7 @@ import {
   CalendarDays,
   ClipboardList,
   FileText,
+  History,
   LayoutDashboard,
   ListTodo,
   MessageCircle,
@@ -173,7 +174,7 @@ export const adminNavigation: NavSection[] = [
  */
 export const doctorNavigation: NavSection[] = [
   {
-    title: 'General',
+    title: 'Mi espacio',
     items: [
       {
         id: 'dashboard',
@@ -181,7 +182,7 @@ export const doctorNavigation: NavSection[] = [
         path: '',
         icon: LayoutDashboard,
         phase: 4,
-        description: 'Resumen del día: turnos, próximos pacientes y tareas pendientes.',
+        description: 'Resumen del día: turnos, pacientes atendidos, pendientes y actividad reciente.',
       },
       {
         id: 'agenda',
@@ -189,20 +190,33 @@ export const doctorNavigation: NavSection[] = [
         path: 'agenda',
         icon: CalendarDays,
         phase: 4,
-        description: 'Agenda personal con vista diaria y semanal.',
+        description: 'Calendario diario, semanal y mensual con turnos, estados y datos de pacientes.',
       },
+    ],
+  },
+  {
+    title: 'Pacientes',
+    items: [
       {
         id: 'pacientes',
         label: 'Mis pacientes',
         path: 'pacientes',
         icon: Users,
         phase: 4,
-        description: 'Pacientes a cargo, estado del tratamiento y acceso al perfil clínico.',
+        description: 'Padrón autorizado de pacientes, búsqueda por DNI o nombre y acceso a fichas.',
+      },
+      {
+        id: 'historial',
+        label: 'Historial de atenciones',
+        path: 'historial',
+        icon: History,
+        phase: 4,
+        description: 'Registro cronológico de consultas anteriores y profesionales intervinientes.',
       },
     ],
   },
   {
-    title: 'Solicitudes',
+    title: 'Gestión médica',
     items: [
       {
         id: 'recetas',
@@ -210,7 +224,7 @@ export const doctorNavigation: NavSection[] = [
         path: 'recetas',
         icon: Pill,
         phase: 4,
-        description: 'Revisión, aprobación y rechazo de recetas solicitadas por los pacientes.',
+        description: 'Revisión profesional de medicación declarada, documentación y antecedentes.',
       },
       {
         id: 'pendientes',
@@ -218,20 +232,20 @@ export const doctorNavigation: NavSection[] = [
         path: 'pendientes',
         icon: ListTodo,
         phase: 4,
-        description: 'Bandeja unificada de solicitudes que requieren su intervención.',
+        description: 'Bandeja de tareas y solicitudes asignadas al profesional.',
       },
       {
         id: 'documentacion',
-        label: 'Documentación',
+        label: 'Documentación recibida',
         path: 'documentacion',
         icon: FileText,
         phase: 4,
-        description: 'Estudios, informes y documentos clínicos de sus pacientes.',
+        description: 'Estudios, informes, recetas y comprobantes administrativos de sus pacientes.',
       },
     ],
   },
   {
-    title: 'Cuenta',
+    title: 'Herramientas',
     items: [
       {
         id: 'notificaciones',
@@ -239,15 +253,15 @@ export const doctorNavigation: NavSection[] = [
         path: 'notificaciones',
         icon: Bell,
         phase: 4,
-        description: 'Avisos de turnos, solicitudes y documentación.',
+        description: 'Avisos de turnos, solicitudes y documentación recibida.',
       },
       {
         id: 'perfil',
-        label: 'Perfil profesional',
+        label: 'Mi perfil',
         path: 'perfil',
         icon: UserRound,
         phase: 4,
-        description: 'Datos profesionales, matrícula y horarios de atención.',
+        description: 'Datos profesionales, matrícula, especialidades y horarios de atención.',
       },
     ],
   },

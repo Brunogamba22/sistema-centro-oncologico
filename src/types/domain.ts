@@ -123,8 +123,18 @@ export interface Appointment extends Timestamps {
 /* ---------- Solicitudes médicas ---------- */
 
 export type MedicalRequestType = 'receta' | 'orden_estudio' | 'certificado' | 'informe' | 'autorizacion';
-export type MedicalRequestStatus = 'pendiente' | 'en_revision' | 'aprobada' | 'rechazada' | 'entregada';
+export type MedicalRequestStatus = 'pendiente' | 'en_revision' | 'info_solicitada' | 'aprobada' | 'rechazada' | 'entregada';
 export type Priority = 'baja' | 'media' | 'alta';
+
+export interface PrescriptionRequestDetails {
+  /** Medicación declarada por el paciente (no constituye prescripción automática). */
+  declaredMedication: string;
+  dose: string;
+  frequency: string;
+  route?: string;
+  reason: string;
+  lastIssuedDate?: string;
+}
 
 export interface MedicalRequestHistoryEntry {
   id: ID;
@@ -143,8 +153,45 @@ export interface MedicalRequest extends Timestamps {
   doctorId?: ID;
   channel: Channel;
   description: string;
+  medicationDetails?: PrescriptionRequestDetails;
   resolutionNotes?: string;
   history?: MedicalRequestHistoryEntry[];
+}
+
+/* ---------- Medicación declarada y notificaciones del profesional ---------- */
+
+export interface DeclaredMedication {
+  id: ID;
+  patientId: ID;
+  name: string;
+  dose: string;
+  frequency: string;
+  route: string;
+  declaredAt: ISODateString;
+  active: boolean;
+  notes?: string;
+}
+
+export type DoctorNotificationCategory = 'turno' | 'receta' | 'solicitud' | 'documento' | 'sistema';
+
+export interface DoctorNotification extends AppNotification {
+  doctorId: ID;
+  category: DoctorNotificationCategory;
+  patientId?: ID;
+}
+
+export interface DocumentPreviewSection {
+  heading: string;
+  lines: string[];
+}
+
+export interface DocumentPreviewContent {
+  documentId: ID;
+  domain: 'clinico' | 'administrativo';
+  issuer: string;
+  documentCode: string;
+  summary: string;
+  sections: DocumentPreviewSection[];
 }
 
 /* ---------- Documentación ---------- */
