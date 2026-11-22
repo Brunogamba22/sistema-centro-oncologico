@@ -20,8 +20,8 @@ export function ChatbotLayout() {
           <span className="hidden sm:inline">Volver al acceso</span>
         </Link>
       </header>
-      <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mx-auto w-full max-w-6xl">
+      <main className="flex-1 px-3 py-4 sm:px-5 lg:px-6">
+        <div className="mx-auto w-full max-w-[1440px]">
           <Suspense fallback={<PageLoader />}>
             <Outlet />
           </Suspense>

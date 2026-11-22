@@ -1,6 +1,6 @@
 import { env } from '@/config/env';
 import { whatsappConversations as initialConversations } from '@/data/whatsappConversations';
-import type { ID, WhatsAppConversation } from '@/types';
+import type { ID, WhatsAppConversation, WhatsAppConversationStatus, WhatsAppMessage } from '@/types';
 import { ApiError, apiClient, mockResponse } from './apiClient';
 
 let store: WhatsAppConversation[] = structuredClone(initialConversations);
@@ -214,5 +214,78 @@ export const whatsappService = {
     };
     store = store.map((c, i) => (i === idx ? updated : c));
     return mockResponse(updated, 250);
+  },
+
+  async createConversation(input: {
+    patientId: ID;
+    phone: string;
+    initialMessages: WhatsAppMessage[];
+    tags?: string[];
+  }): Promise<WhatsAppConversation> {
+    const now = new Date().toISOString();
+    const lastMessageAt = input.initialMessages[input.initialMessages.length - 1]?.sentAt ?? now;
+    const created: WhatsAppConversation = {
+      id: `wa-${String(store.length + 1).padStart(3, '0')}-${Date.now().toString().slice(-3)}`,
+      patientId: input.patientId,
+      phone: input.phone,
+      status: 'bot',
+      botEnabled: true,
+      department: 'Asistente virtual',
+      unreadCount: 0,
+      tags: input.tags ?? ['Bot activo'],
+      lastMessageAt,
+      messages: input.initialMessages,
+    };
+    store = [created, ...store];
+    return mockResponse(created, 100);
+  },
+
+  async appendMessages(
+    id: ID,
+    newMessages: WhatsAppMessage[],
+    patch?: Partial<{
+      patientId: ID;
+      phone: string;
+      status: WhatsAppConversationStatus;
+      botEnabled: boolean;
+      department: WhatsAppConversation['department'];
+      assignedTo: string | undefined;
+      tags: string[];
+      unreadCount: number;
+    }>,
+  ): Promise<WhatsAppConversation> {
+    const idx = store.findIndex((c) => c.id === id);
+    if (idx === -1) throw new ApiError('Conversación no encontrada', 404);
+    const conv = store[idx];
+    const lastMessageAt = newMessages[newMessages.length - 1]?.sentAt ?? new Date().toISOString();
+    const updated: WhatsAppConversation = {
+      ...conv,
+      ...patch,
+      lastMessageAt,
+      messages: [...conv.messages, ...newMessages],
+    };
+    store = store.map((c, i) => (i === idx ? updated : c));
+    return mockResponse(updated, 80);
+  },
+
+  async resetConversation(id: ID, initialMessages: WhatsAppMessage[], patientId?: ID): Promise<WhatsAppConversation> {
+    const idx = store.findIndex((c) => c.id === id);
+    if (idx === -1) throw new ApiError('Conversación no encontrada', 404);
+    const conv = store[idx];
+    const lastMessageAt = initialMessages[initialMessages.length - 1]?.sentAt ?? new Date().toISOString();
+    const updated: WhatsAppConversation = {
+      ...conv,
+      patientId: patientId !== undefined ? patientId : conv.patientId,
+      status: 'bot',
+      botEnabled: true,
+      assignedTo: undefined,
+      department: 'Asistente virtual',
+      unreadCount: 0,
+      tags: ['Bot activo', 'Verificación'],
+      lastMessageAt,
+      messages: initialMessages,
+    };
+    store = store.map((c, i) => (i === idx ? updated : c));
+    return mockResponse(updated, 80);
   },
 };
